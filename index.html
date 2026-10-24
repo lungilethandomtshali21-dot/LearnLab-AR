@@ -1,0 +1,574 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="LearnLab AR - Interactive Photosynthesis Explorer">
+<title>LearnLab AR | Photosynthesis Explorer</title>
+
+<style>
+:root {
+  --green:#18362f;
+  --dark:#10271f;
+  --cream:#fff4e5;
+  --lime:#d5ec9b;
+  --coral:#ff9e78;
+  --purple:#e6c7fa;
+  --white:#ffffff;
+}
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  margin:0;
+  background:var(--cream);
+  color:var(--green);
+  font-family:Arial,Helvetica,sans-serif;
+}
+button { font:inherit; cursor:pointer; }
+header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  flex-wrap:wrap;
+  padding:20px 7%;
+  background:var(--green);
+  color:var(--cream);
+}
+.logo {
+  font-size:22px;
+  font-weight:900;
+}
+header span { font-size:13px; }
+.hero {
+  padding:70px 7%;
+  background:var(--green);
+  color:var(--cream);
+}
+.eyebrow {
+  font-size:12px;
+  text-transform:uppercase;
+  font-weight:800;
+  letter-spacing:2px;
+  color:var(--coral);
+}
+h1 {
+  max-width:900px;
+  margin:20px 0;
+  font-size:clamp(45px,7vw,85px);
+  line-height:1.05;
+  letter-spacing:-3px;
+}
+h1 span { color:var(--lime); }
+.hero p {
+  max-width:650px;
+  line-height:1.8;
+  font-size:17px;
+}
+section { padding:65px 7%; }
+h2 {
+  font-size:clamp(32px,4vw,52px);
+  letter-spacing:-2px;
+  margin:10px 0 20px;
+}
+.intro { max-width:700px; line-height:1.8; }
+.explorer {
+  display:grid;
+  grid-template-columns:1.2fr 1fr;
+  gap:25px;
+  align-items:stretch;
+  margin-top:35px;
+}
+.diagram {
+  position:relative;
+  min-height:440px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+  border-radius:24px;
+  background:linear-gradient(#d9eff5 0%,#e7f7d8 72%,#ad7955 72%);
+}
+.sun {
+  position:absolute;
+  top:25px;
+  left:35px;
+  font-size:75px;
+  animation:glow 3s ease-in-out infinite;
+}
+@keyframes glow {
+  50% { transform:scale(1.08); }
+}
+.plant {
+  position:relative;
+  z-index:1;
+  font-size:195px;
+  filter:drop-shadow(0 10px 8px #0002);
+}
+.diagram-label {
+  position:absolute;
+  z-index:2;
+  border:2px solid var(--green);
+  border-radius:30px;
+  padding:10px 13px;
+  background:var(--cream);
+  color:var(--green);
+  font-size:12px;
+  font-weight:800;
+  box-shadow:3px 4px 0 #18362f33;
+}
+.label-sun { top:35px; right:20px; }
+.label-water { bottom:25px; left:15px; }
+.label-co2 { top:160px; left:12px; }
+.label-oxygen { top:170px; right:12px; }
+.label-glucose { bottom:25px; right:12px; }
+
+.info-panel {
+  display:flex;
+  flex-direction:column;
+  padding:30px;
+  border-radius:24px;
+  background:var(--lime);
+}
+.info-panel h3 {
+  margin:0 0 15px;
+  font-size:27px;
+}
+.info-panel p {
+  line-height:1.8;
+  font-size:16px;
+}
+.topic-buttons {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:20px;
+}
+.topic-buttons button {
+  border:1px solid var(--green);
+  border-radius:25px;
+  padding:11px 14px;
+  background:var(--cream);
+  color:var(--green);
+  font-size:13px;
+  font-weight:700;
+}
+.topic-buttons button.active,
+.topic-buttons button:hover {
+  background:var(--green);
+  color:var(--cream);
+}
+.equation-section {
+  background:#f7dfca;
+}
+.equation {
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:center;
+  gap:12px;
+  margin-top:25px;
+  padding:28px;
+  border-radius:22px;
+  background:var(--cream);
+}
+.equation span {
+  padding:14px;
+  border-radius:14px;
+  background:var(--lime);
+  font-weight:800;
+}
+.equation strong { font-size:25px; }
+
+.quiz-section { background:var(--green); color:var(--cream); }
+.quiz-card {
+  max-width:760px;
+  padding:30px;
+  border-radius:24px;
+  background:var(--cream);
+  color:var(--green);
+}
+.quiz-progress {
+  font-size:13px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+.quiz-card h3 {
+  font-size:25px;
+  line-height:1.4;
+}
+.quiz-options {
+  display:grid;
+  gap:12px;
+  margin:25px 0;
+}
+.quiz-options button {
+  padding:16px;
+  border:2px solid #d6d3c6;
+  border-radius:13px;
+  background:white;
+  color:var(--green);
+  text-align:left;
+}
+.quiz-options button:hover:not(:disabled) {
+  border-color:var(--green);
+  background:var(--lime);
+}
+.quiz-options button.correct {
+  border-color:#2b8b4b;
+  background:#d7f3d7;
+}
+.quiz-options button.wrong {
+  border-color:#c75a45;
+  background:#ffe0d8;
+}
+.quiz-options button:disabled { cursor:default; }
+.feedback {
+  min-height:35px;
+  font-weight:700;
+  line-height:1.6;
+}
+.next-button {
+  border:0;
+  border-radius:30px;
+  padding:14px 25px;
+  background:var(--coral);
+  color:var(--green);
+  font-weight:800;
+}
+.next-button:disabled {
+  opacity:.4;
+  cursor:not-allowed;
+}
+footer {
+  padding:25px 7%;
+  background:var(--dark);
+  color:var(--cream);
+  font-size:13px;
+}
+@media(max-width:800px) {
+  .explorer { grid-template-columns:1fr; }
+  .diagram { min-height:380px; }
+  .plant { font-size:160px; }
+}
+@media(max-width:450px) {
+  .diagram-label {
+    font-size:10px;
+    padding:8px;
+  }
+  .label-co2 { top:145px; }
+  .label-oxygen { top:195px; }
+  .plant { font-size:140px; }
+  section { padding:50px 5%; }
+}
+@media(prefers-reduced-motion:reduce) {
+  html { scroll-behavior:auto; }
+  .sun { animation:none; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">🌱 LearnLab AR</div>
+  <span>Interactive Learning Studio</span>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="eyebrow">Explore · Discover · Learn</div>
+    <h1>How do plants <span>make food?</span></h1>
+    <p>
+      Welcome to Photosynthesis Explorer! Discover how sunlight,
+      water and carbon dioxide help plants grow.
+      Tap the learning buttons, explore the diagram,
+      then test your knowledge.
+    </p>
+  </div>
+
+  <section id="explore">
+    <div class="eyebrow">Interactive science</div>
+    <h2>Explore photosynthesis.</h2>
+    <p class="intro">
+      Photosynthesis is the process plants use to make glucose,
+      a type of sugar, using energy from sunlight.
+      Select a topic to learn more.
+    </p>
+
+    <div class="explorer">
+      <div class="diagram" aria-label="Illustrated plant with photosynthesis labels">
+        <div class="sun" aria-hidden="true">☀️</div>
+        <div class="plant" aria-hidden="true">🌱</div>
+
+        <button class="diagram-label label-sun" data-topic="sun">
+          ☀️ Sunlight
+        </button>
+        <button class="diagram-label label-water" data-topic="water">
+          💧 Water
+        </button>
+        <button class="diagram-label label-co2" data-topic="co2">
+          🌬️ CO₂
+        </button>
+        <button class="diagram-label label-oxygen" data-topic="oxygen">
+          🍃 Oxygen
+        </button>
+        <button class="diagram-label label-glucose" data-topic="glucose">
+          🍬 Glucose
+        </button>
+      </div>
+
+      <div class="info-panel">
+        <h3 id="topicTitle">Hello, scientist! 👋</h3>
+        <p id="topicDescription" aria-live="polite">
+          Tap any label around the plant to discover its role
+          in photosynthesis.
+        </p>
+
+        <div class="topic-buttons">
+          <button data-topic="sun">Sunlight</button>
+          <button data-topic="water">Water</button>
+          <button data-topic="co2">Carbon dioxide</button>
+          <button data-topic="glucose">Glucose</button>
+          <button data-topic="oxygen">Oxygen</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="equation-section">
+    <div class="eyebrow">The science</div>
+    <h2>The photosynthesis equation.</h2>
+    <p class="intro">
+      With light energy, plants turn carbon dioxide and water
+      into glucose and oxygen.
+    </p>
+
+    <div class="equation" aria-label="Carbon dioxide plus water produces glucose plus oxygen, using light energy">
+      <span>Carbon dioxide</span>
+      <strong>+</strong>
+      <span>Water</span>
+      <strong>→</strong>
+      <span>Glucose</span>
+      <strong>+</strong>
+      <span>Oxygen</span>
+    </div>
+
+    <p class="intro">
+      <strong>Light energy</strong> powers the process.
+      The balanced chemical equation is:
+      6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂.
+    </p>
+  </section>
+
+  <section class="quiz-section" id="quiz">
+    <div class="eyebrow">Test your knowledge</div>
+    <h2>Ready for a challenge?</h2>
+    <p class="intro">
+      Answer three questions to see what you've learned.
+    </p>
+
+    <div class="quiz-card">
+      <div class="quiz-progress" id="quizProgress"></div>
+      <h3 id="quizQuestion"></h3>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="feedback" id="quizFeedback" aria-live="polite"></div>
+      <button class="next-button" id="nextButton" disabled>
+        Next question →
+      </button>
+    </div>
+  </section>
+</main>
+
+<footer>
+  © <span id="year"></span> LearnLab AR · A creative learning prototype
+</footer>
+
+<script>
+document.getElementById("year").textContent =
+  new Date().getFullYear();
+
+const topics = {
+  sun: {
+    title: "☀️ Sunlight",
+    description:
+      "Sunlight provides the energy needed for photosynthesis. Chlorophyll in the plant's leaves absorbs light energy."
+  },
+  water: {
+    title: "💧 Water",
+    description:
+      "Plants absorb water from the soil through their roots. Water travels through the plant to the leaves, where it is used during photosynthesis."
+  },
+  co2: {
+    title: "🌬️ Carbon dioxide",
+    description:
+      "Carbon dioxide is a gas in the air. It enters leaves through tiny openings called stomata and supplies carbon for making glucose."
+  },
+  glucose: {
+    title: "🍬 Glucose",
+    description:
+      "Glucose is a sugar produced during photosynthesis. Plants use it for energy and growth, and can convert it into other substances."
+  },
+  oxygen: {
+    title: "🍃 Oxygen",
+    description:
+      "Oxygen is produced during photosynthesis and much of it is released into the air through openings in the leaves."
+  }
+};
+
+const topicTitle = document.getElementById("topicTitle");
+const topicDescription = document.getElementById("topicDescription");
+
+document.querySelectorAll("[data-topic]").forEach(button => {
+  button.addEventListener("click", () => {
+    const key = button.dataset.topic;
+    const topic = topics[key];
+
+    topicTitle.textContent = topic.title;
+    topicDescription.textContent = topic.description;
+
+    document.querySelectorAll("[data-topic]").forEach(item => {
+      item.classList.toggle(
+        "active",
+        item.dataset.topic === key
+      );
+    });
+  });
+});
+
+/* INTERACTIVE QUIZ */
+
+const questions = [
+  {
+    question: "What provides the energy for photosynthesis?",
+    options: ["Wind", "Sunlight", "Soil"],
+    answer: 1,
+    explanation:
+      "Sunlight supplies the energy plants need to make glucose."
+  },
+  {
+    question: "Which gas do plants take in for photosynthesis?",
+    options: ["Carbon dioxide", "Oxygen", "Helium"],
+    answer: 0,
+    explanation:
+      "Plants absorb carbon dioxide from the air through their leaves."
+  },
+  {
+    question: "Which sugar is produced during photosynthesis?",
+    options: ["Salt", "Glucose", "Protein"],
+    answer: 1,
+    explanation:
+      "Photosynthesis produces glucose, which plants use for energy and growth."
+  }
+];
+
+let questionIndex = 0;
+let score = 0;
+let answered = false;
+
+const quizProgress = document.getElementById("quizProgress");
+const quizQuestion = document.getElementById("quizQuestion");
+const quizOptions = document.getElementById("quizOptions");
+const quizFeedback = document.getElementById("quizFeedback");
+const nextButton = document.getElementById("nextButton");
+
+function showQuestion() {
+  answered = false;
+  nextButton.disabled = true;
+  quizFeedback.textContent = "";
+  quizOptions.replaceChildren();
+
+  const current = questions[questionIndex];
+
+  quizProgress.textContent =
+    "Question " + (questionIndex + 1) + " of " + questions.length;
+
+  quizQuestion.textContent = current.question;
+
+  current.options.forEach((option, index) => {
+    const button = document.createElement("button");
+    button.textContent = option;
+
+    button.addEventListener("click", () => {
+      selectAnswer(index);
+    });
+
+    quizOptions.appendChild(button);
+  });
+
+  nextButton.textContent =
+    questionIndex === questions.length - 1
+      ? "See my results →"
+      : "Next question →";
+}
+
+function selectAnswer(selectedIndex) {
+  if (answered) return;
+
+  answered = true;
+
+  const current = questions[questionIndex];
+  const buttons = quizOptions.querySelectorAll("button");
+
+  if (selectedIndex === current.answer) {
+    score++;
+    quizFeedback.textContent =
+      "Correct! " + current.explanation;
+  } else {
+    quizFeedback.textContent =
+      "Not quite. " + current.explanation;
+  }
+
+  buttons.forEach((button, index) => {
+    button.disabled = true;
+
+    if (index === current.answer) {
+      button.classList.add("correct");
+    } else if (index === selectedIndex) {
+      button.classList.add("wrong");
+    }
+  });
+
+  nextButton.disabled = false;
+}
+
+function showResults() {
+  quizProgress.textContent = "Quiz complete!";
+  quizQuestion.textContent =
+    "You scored " + score + " out of " + questions.length + "!";
+
+  quizOptions.replaceChildren();
+
+  quizFeedback.textContent =
+    score === questions.length
+      ? "Excellent! You've mastered the basics of photosynthesis."
+      : "Good effort! Explore the diagram again and try to improve your score.";
+
+  nextButton.textContent = "Try again ↻";
+  nextButton.disabled = false;
+}
+
+nextButton.addEventListener("click", () => {
+  if (questionIndex >= questions.length) {
+    questionIndex = 0;
+    score = 0;
+    showQuestion();
+    return;
+  }
+
+  if (questionIndex === questions.length - 1) {
+    questionIndex = questions.length;
+    showResults();
+  } else {
+    questionIndex++;
+    showQuestion();
+  }
+});
+
+showQuestion();
+</script>
+
+</body>
+</html>
